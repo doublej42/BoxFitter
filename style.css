@@ -27,7 +27,10 @@
 .box
 {
     position: absolute;
+    display: block;
     /*Default values if not specifed*/    
     border: 1px solid black;
+    box-sizing: border-box;   
+    background-color: lightblue;
 }
 
