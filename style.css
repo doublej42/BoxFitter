@@ -1,9 +1,33 @@
-#container
+#pageContainer
 {
+    background-color: #CCCCCC;
+    width: min(90vw,80vh);
+    height: min(90vw,80vh);
+    position: relative;
+}
 
+.flexContainer {
+    display: flex; /* or inline-flex */
+    flex-direction: row
+  }
+
+#controls
+{
+    border: 1px solid black;
+    
+    background-color: lightpink;
+}
+
+#selectedList
+{
+    border: 1px solid black;
+    background-color: lightgreen;
 }
 
 .box
 {
-    
+    position: absolute;
+    /*Default values if not specifed*/    
+    border: 1px solid black;
 }
+
