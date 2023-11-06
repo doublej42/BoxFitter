@@ -2,35 +2,52 @@ var parentList = [];
 
 function addBox(event) {
     console.log("Adding new box");
-    if (parentList.length == 0)
-    {
+    if (parentList.length == 0) {
         parentList.push(document.getElementById("pageContainer"));
     }
     parentList.forEach((item) => {
-        
+
         const newBox = document.createElement("div");
-        newBox.id = "t1";
         newBox.classList.add("box");
         newBox.classList.add("parent");
         newBox.dataset.width = document.getElementById("width").value;
         newBox.dataset.height = document.getElementById("height").value;
         newBox.dataset.name = document.getElementById("name").value;
+        newBox.style.top = 0;
+        newBox.style.left = 0;
         var parentWidth, parentHeight;
-        if ("width" in item.dataset)
-        {
-            //todo    
+        if ("width" in item.dataset) {
+            parentWidth = item.dataset.width;
+            parentHeight = item.dataset.height;
+            newBox.dataset.scale = Math.max(1, Math.min(parentWidth / newBox.dataset.width, parentHeight / newBox.dataset.height));
+
+            // debugger
+            // let otherBoxes = item.getElementsByClassName("box");
+
+            // //for (let otherBox of otherBoxes) {
+            // for (var i = 0; i < otherBoxes.length; i++) {
+            //     let otherBox = otherBoxes[i]
+            //     console.log(item.id);
+            //     let rect = otherBox.getBoundingClientRect();
+            //     if (rect.right + (newBox.dataset.width * newBox.dataset.scale) < (parentWidth * item.dataset.scale) ) {
+            //         newBox.style.left = rect.right;
+            //         i = otherBoxes.length;//stop the loop
+            //     }
+            // }
+
         }
-        else
-        {   
+        else {
+            //first item added is your worksurface
             parentWidth = item.clientWidth;
             parentHeight = item.clientHeight;
+            newBox.dataset.scale = Math.min(parentWidth / newBox.dataset.width, parentHeight / newBox.dataset.height);
         }
-        newBox.dataset.scale = Math.min(parentWidth/newBox.dataset.width,parentHeight/newBox.dataset.height);
-        
-        newBox.innerHTML = newBox.dataset.scale;
+        newBox.innerHTML = newBox.dataset.name + " scale:" +  newBox.dataset.scale;
         item.appendChild(newBox);
         newBox.style.width = (newBox.dataset.width * newBox.dataset.scale) + "px";
         newBox.style.height = (newBox.dataset.height * newBox.dataset.scale) + "px";
+
+
     });
 }
 
@@ -44,8 +61,7 @@ function selectParent(event) {
             //if you click on a selected item remove it.
             parentList = parentList.filter(item => item != event.target)
         }
-        else
-        {
+        else {
             parentList.push(event.target);
         }
         console.log("parentList", parentList);
@@ -65,9 +81,51 @@ function updateSelectedList() {
     });
 }
 
+function dragBoxParent(event) {
+    if (event.target.classList.contains("box")) {
+        let rect = event.target.getBoundingClientRect();
+        console.log("Start Drag",rect.left,rect.top,event.clientX,event.clientY,event.target.style.left,event.target.style.top);
+        var shiftLeft = parseInt(event.target.style.left.replace("px",""));
+        var shiftTop = parseInt(event.target.style.top.replace("px",""));
+        var shiftX = event.clientX;
+        var shiftY = event.clientY;
+        var moveTarget = event.target;
+        //mouse might move outside of box in a case where mouse is faster than redraw
+        document.addEventListener('mousemove', moveBox);        
+        document.addEventListener('mouseup', cleanupMouse);
+        // event.target.addEventListener('mouseout', event => {
+        //     //issues because of dragging ot fast
+        //     console.log("Emergency Stop Drag")
+        //     event.target.removeEventListener('mousemove', moveBox);
+        // });
+    }
+
+    function cleanupMouse(event)
+    {
+        console.log("Stop Drag")
+        document.removeEventListener('mousemove', moveBox);
+        document.removeEventListener('mouseup',cleanupMouse);
+    }
+
+    function moveBox(event) {
+        //console.log(event.pageX, event.pageY);
+        //console.log('before', event.target.style.left, event.target.style.top)
+        //let left = event.target.style.left.replace('px', '')
+        //let right = event.target.style.top.replace('px', '')
+        console.log("move",event.clientX,shiftX,shiftLeft,event.clientX - shiftX  + shiftLeft);
+        moveTarget.style.left = event.clientX - shiftX  + shiftLeft +  'px';
+        moveTarget.style.top = event.clientY - shiftY + shiftTop + 'px';
+        //console.log('after', event.target.style.left, event.target.style.top)
+    
+    }
+    
+    
+}
+
 document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("AddBox").addEventListener('click', addBox);
     let pageContainer = document.getElementById("pageContainer");
     pageContainer.addEventListener('click', selectParent);
+    pageContainer.addEventListener('mousedown', dragBoxParent);
 });
