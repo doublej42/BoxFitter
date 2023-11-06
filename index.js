@@ -15,6 +15,7 @@ function addBox(event) {
         newBox.dataset.name = document.getElementById("name").value;
         newBox.style.top = 0;
         newBox.style.left = 0;
+        newBox.appendChild(document.createTextNode("Loading"));
         var parentWidth, parentHeight;
         if ("width" in item.dataset) {
             parentWidth = item.dataset.width;
@@ -36,9 +37,10 @@ function addBox(event) {
 
 function setSize(target) {
     target.dataset.scale = Math.floor(target.dataset.scale * 100) / 100;
-    target.innerHTML = "name: " + target.dataset.name + "<br/>Scale:" + target.dataset.scale;
+    
+    target.firstChild.nodeValue = "name: " + target.dataset.name + " Scale:" + target.dataset.scale;
     if (target.parentElement.classList.contains("box")) {
-        target.innerHTML += "<br/>Relative Scale: " + target.parentElement.dataset.scale / target.dataset.scale
+        target.firstChild.nodeValue  += " Relative Scale: " + target.parentElement.dataset.scale / target.dataset.scale
     }
     target.style.width = (target.dataset.width * target.dataset.scale) + "px";
     target.style.height = (target.dataset.height * target.dataset.scale) + "px";
